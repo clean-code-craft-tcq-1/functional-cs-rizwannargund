@@ -1,38 +1,60 @@
 using System;
 using System.Diagnostics;
 
-class Checker
+namespace BatteryManagementSystem
 {
-    static bool batteryIsOk(float temperature, float soc, float chargeRate) {
-        if(temperature < 0 || temperature > 45) {
-            Console.WriteLine("Temperature is out of range!");
-            return false;
-        } else if(soc < 20 || soc > 80) {
-            Console.WriteLine("State of Charge is out of range!");
-            return false;
-        } else if(chargeRate > 0.8) {
-            Console.WriteLine("Charge Rate is out of range!");
-            return false;
+    public class BatteryStateChecker
+    {
+        public static bool IsTemperatureValid(BatteryMonitor batteryMonitor)
+        {
+            return new TemperatureValidator().IsValid(batteryMonitor);
         }
-        return true;
-    }
+        public static bool IsStateOfChargeValid(BatteryMonitor batteryMonitor)
+        {
+            return new StateOfChargeValidator().IsValid(batteryMonitor);
+        }
+        public static bool IsChargeRateValid(BatteryMonitor batteryMonitor)
+        {
+            return new ChargeRateValidator().IsValid(batteryMonitor);
+        }
+        public static BreachLevel GetTemperatureBreachLevel(BatteryMonitor batteryMonitor)
+        {
+            return new TemperatureValidator().GetBreachLevel(batteryMonitor);
+        }
+        public static BreachLevel GetChargeRateBreachLevel(BatteryMonitor batteryMonitor)
+        {
+            return new ChargeRateValidator().GetBreachLevel(batteryMonitor);
+        }
+        public static BreachLevel GetStateOfChargeBreachLevel(BatteryMonitor batteryMonitor)
+        {
+            return new StateOfChargeValidator().GetBreachLevel(batteryMonitor);
+        }
 
-    static void ExpectTrue(bool expression) {
-        if(!expression) {
-            Console.WriteLine("Expected true, but got false");
-            Environment.Exit(1);
+        static int Main()
+        {
+            Debug.Assert(IsTemperatureValid(new BatteryMonitor(25, 65, 0.7f)));
+            Debug.Assert(!IsTemperatureValid(new BatteryMonitor(50, 65, 0.7f)));
+
+            Debug.Assert(IsStateOfChargeValid(new BatteryMonitor(25, 65, 0.7f)));
+            Debug.Assert(!IsStateOfChargeValid(new BatteryMonitor(25, 105, 0.7f)));
+
+            Debug.Assert(IsChargeRateValid(new BatteryMonitor(25, 65, 0.7f)));
+            Debug.Assert(!IsChargeRateValid(new BatteryMonitor(25, 65, 0.9f)));
+
+            Debug.Assert(GetTemperatureBreachLevel(new BatteryMonitor(-5, 65, 0.7f)) == BreachLevel.Low);
+            Debug.Assert(GetTemperatureBreachLevel(new BatteryMonitor(15, 65, 0.7f)) == BreachLevel.Normal);
+            Debug.Assert(GetTemperatureBreachLevel(new BatteryMonitor(80, 65, 0.7f)) == BreachLevel.High);
+
+            Debug.Assert(GetStateOfChargeBreachLevel(new BatteryMonitor(15, 10, 0.7f)) == BreachLevel.Low);
+            Debug.Assert(GetStateOfChargeBreachLevel(new BatteryMonitor(15, 50, 0.7f)) == BreachLevel.Normal);
+            Debug.Assert(GetStateOfChargeBreachLevel(new BatteryMonitor(15, 100, 0.7f)) == BreachLevel.High);
+
+            Debug.Assert(GetChargeRateBreachLevel(new BatteryMonitor(15, 65, 0.2f)) == BreachLevel.Low);
+            Debug.Assert(GetChargeRateBreachLevel(new BatteryMonitor(15, 65, 0.7f)) == BreachLevel.Normal);
+
+            Debug.Assert(GetChargeRateBreachLevel(new BatteryMonitor(15, 65, 0.9f)) == BreachLevel.High);
+            Console.WriteLine("All ok");
+            return 0;
         }
-    }
-    static void ExpectFalse(bool expression) {
-        if(expression) {
-            Console.WriteLine("Expected false, but got true");
-            Environment.Exit(1);
-        }
-    }
-    static int Main() {
-        ExpectTrue(batteryIsOk(25, 70, 0.7f));
-        ExpectFalse(batteryIsOk(50, 85, 0.0f));
-        Console.WriteLine("All ok");
-        return 0;
     }
 }
