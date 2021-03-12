@@ -5,54 +5,68 @@ namespace BatteryManagementSystem
 {
     public class BatteryStateChecker
     {
-        public static bool IsTemperatureValid(BatteryStateControl batteryStateControl)
+        private static BatteryRangeValidator batteryRangeValidator = new BatteryRangeValidator();
+        static bool IsBatteryOk(float temperature, float soc, float chargeRate)
         {
-            return new TemperatureValidator().IsValid(batteryStateControl);
-        }
-        public static bool IsStateOfChargeValid(BatteryStateControl batteryStateControl)
-        {
-            return new StateOfChargeValidator().IsValid(batteryStateControl);
-        }
-        public static bool IsChargeRateValid(BatteryStateControl batteryStateControl)
-        {
-            return new ChargeRateValidator().IsValid(batteryStateControl);
-        }
-        public static BreachLevel GetTemperatureBreachLevel(BatteryStateControl batteryStateControl)
-        {
-            return new TemperatureValidator().GetBreachLevel(batteryStateControl);
-        }
-        public static BreachLevel GetChargeRateBreachLevel(BatteryStateControl batteryStateControl)
-        {
-            return new ChargeRateValidator().GetBreachLevel(batteryStateControl);
-        }
-        public static BreachLevel GetStateOfChargeBreachLevel(BatteryStateControl batteryStateControl)
-        {
-            return new StateOfChargeValidator().GetBreachLevel(batteryStateControl);
+            if (batteryRangeValidator.IsTemperatureRangeValid(temperature) &&
+                batteryRangeValidator.IsSocRangeValid(soc) && 
+                batteryRangeValidator.IsChargeRateRangeValid(chargeRate))
+            {
+                Logger.PrintMessage("Battery state is good.");
+                return true;
+            }
+            else
+            {
+                Logger.PrintMessage("Battery state is critical!");
+                return false;
+            }
         }
 
         static int Main()
         {
-            Debug.Assert(IsTemperatureValid(new BatteryStateControl(25, 65, 0.7f)));
-            Debug.Assert(!IsTemperatureValid(new BatteryStateControl(50, 65, 0.7f)));
+            batteryRangeValidator.MinimumTemperature = 0;
+            batteryRangeValidator.MaximumTemperature = 45;
+            batteryRangeValidator.MinimumSoc = 20;
+            batteryRangeValidator.MaximumSoc = 80;
+            batteryRangeValidator.MaximumChargeRate = 0.8f;
 
-            Debug.Assert(IsStateOfChargeValid(new BatteryStateControl(25, 65, 0.7f)));
-            Debug.Assert(!IsStateOfChargeValid(new BatteryStateControl(25, 105, 0.7f)));
+            IsBatteryOk(-1, 70, 0.7f);
+            IsBatteryOk(25, 70, 0.7f);
+            IsBatteryOk(46, 70, 0.7f);
 
-            Debug.Assert(IsChargeRateValid(new BatteryStateControl(25, 65, 0.7f)));
-            Debug.Assert(!IsChargeRateValid(new BatteryStateControl(25, 65, 0.9f)));
+            IsBatteryOk(25, 10, 0.7f);
+            IsBatteryOk(25, 70, 0.7f);
+            IsBatteryOk(25, 81, 0.7f);
 
-            Debug.Assert(GetTemperatureBreachLevel(new BatteryStateControl(-5, 65, 0.7f)) == BreachLevel.Low);
-            Debug.Assert(GetTemperatureBreachLevel(new BatteryStateControl(15, 65, 0.7f)) == BreachLevel.Normal);
-            Debug.Assert(GetTemperatureBreachLevel(new BatteryStateControl(80, 65, 0.7f)) == BreachLevel.High);
+            IsBatteryOk(25, 70, 0.7f);
+            IsBatteryOk(25, 70, 0.8f);
 
-            Debug.Assert(GetStateOfChargeBreachLevel(new BatteryStateControl(15, 10, 0.7f)) == BreachLevel.Low);
-            Debug.Assert(GetStateOfChargeBreachLevel(new BatteryStateControl(15, 50, 0.7f)) == BreachLevel.Normal);
-            Debug.Assert(GetStateOfChargeBreachLevel(new BatteryStateControl(15, 100, 0.7f)) == BreachLevel.High);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                batteryRangeValidator.MinimumTemperature,
+                -1);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                batteryRangeValidator.MinimumTemperature,
+                25);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                batteryRangeValidator.MinimumTemperature,
+                46);
 
-            Debug.Assert(GetChargeRateBreachLevel(new BatteryStateControl(15, 65, 0.2f)) == BreachLevel.Low);
-            Debug.Assert(GetChargeRateBreachLevel(new BatteryStateControl(15, 65, 0.7f)) == BreachLevel.Normal);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                batteryRangeValidator.MinimumSoc,
+                10);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                batteryRangeValidator.MinimumSoc,
+                70);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                batteryRangeValidator.MinimumSoc,
+                81);
 
-            Debug.Assert(GetChargeRateBreachLevel(new BatteryStateControl(15, 65, 0.9f)) == BreachLevel.High);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
+                0,
+                0.8f);
+            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
+                0,
+                0.7f);
             Console.WriteLine("All ok");
             return 0;
         }

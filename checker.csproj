@@ -1,17 +1,19 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="Current">
   <PropertyGroup>
-    <RootNamespace>BatteryManagementSystem</RootNamespace>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <ProjectGuid>{F846B7D1-43BF-4653-9BBA-3C6A8BA6657D}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BatteryRangeValidator.cs" />
+    <Compile Include="BreachChecker.cs" />
     <Compile Include="checker.cs" />
-    <Compile Include="BatteryMonitor.cs" />
-    <Compile Include="ChargeRateValidator.cs" />
     <Compile Include="IValidator.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateOfChargeValidator.cs" />
-    <Compile Include="TemperatureValidator.cs" />
+    <Compile Include="Logger.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Target Name="Build">
     <Csc Sources="@(Compile)" />  
   </Target>

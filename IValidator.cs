@@ -1,16 +1,14 @@
-﻿namespace BatteryManagementSystem
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace BatteryManagementSystem
 {
-    public interface IValidator<T>
+    interface IValidator
     {
-        bool IsValid(T t);
-
-        BreachLevel GetBreachLevel(T t);
-    }
-
-    public enum BreachLevel
-    {
-        Low,
-        Normal,
-        High
+        bool IsTemperatureRangeValid(float temperature);
+        bool IsSocRangeValid(float soc);
+        bool IsChargeRateRangeValid(float chargeRate);
     }
 }
