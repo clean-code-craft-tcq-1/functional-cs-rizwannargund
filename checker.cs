@@ -6,22 +6,13 @@ namespace BatteryManagementSystem
     public class BatteryStateChecker
     {
         private static BatteryRangeValidator batteryRangeValidator = new BatteryRangeValidator();
-        static bool IsBatteryOk(float temperature, float soc, float chargeRate)
-        {
-            if (batteryRangeValidator.IsTemperatureRangeValid(temperature) &&
-                batteryRangeValidator.IsSocRangeValid(soc) && 
-                batteryRangeValidator.IsChargeRateRangeValid(chargeRate))
-            {
-                Logger.Log("Battery state is good.");
-                return true;
-            }
-            else
-            {
-                Logger.Log("Battery state is critical!");
-                return false;
-            }
-        }
 
+        static bool IsBatteryOk(float temperature, float soc, float chargeRate)
+            =>
+                (batteryRangeValidator.IsTemperatureRangeValid(temperature) &&
+                 batteryRangeValidator.IsSocRangeValid(soc) &&
+                 batteryRangeValidator.IsChargeRateRangeValid(chargeRate));
+        
         static int Main()
         {
             batteryRangeValidator.MinimumTemperature = 0;
@@ -30,43 +21,43 @@ namespace BatteryManagementSystem
             batteryRangeValidator.MaximumSoc = 80;
             batteryRangeValidator.MaximumChargeRate = 0.8f;
 
-            IsBatteryOk(-1, 70, 0.7f);
-            IsBatteryOk(25, 70, 0.7f);
-            IsBatteryOk(46, 70, 0.7f);
+            Logger.LogBatteryState(IsBatteryOk(-1, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(46, 70, 0.7f));
 
-            IsBatteryOk(25, 10, 0.7f);
-            IsBatteryOk(25, 70, 0.7f);
-            IsBatteryOk(25, 81, 0.7f);
+            Logger.LogBatteryState(IsBatteryOk(25, 10, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 81, 0.7f));
 
-            IsBatteryOk(25, 70, 0.7f);
-            IsBatteryOk(25, 70, 0.8f);
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.8f));
 
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
                 batteryRangeValidator.MinimumTemperature,
-                -1);
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                -1),"Temperature");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
                 batteryRangeValidator.MinimumTemperature,
-                25);
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                25),"Temperature");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
                 batteryRangeValidator.MinimumTemperature,
-                46);
+                46),"Temperature");
 
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
                 batteryRangeValidator.MinimumSoc,
-                10);
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                10),"State of charge");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
                 batteryRangeValidator.MinimumSoc,
-                70);
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                70),"State of charge");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
                 batteryRangeValidator.MinimumSoc,
-                81);
+                81),"State of charge");
 
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
                 0,
-                0.8f);
-            BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
+                0.8f),"Charge rate");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
                 0,
-                0.7f);
+                0.7f),"Charge rate");
             Console.WriteLine("All ok");
             return 0;
         }
