@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace BatteryManagementSystem
 {
-    public class Checker
+    public class BatteryStateChecker
     {
         private static BatteryRangeValidator batteryRangeValidator = new BatteryRangeValidator();
         static bool IsBatteryOk(float temperature, float soc, float chargeRate)
