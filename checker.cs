@@ -12,12 +12,12 @@ namespace BatteryManagementSystem
                 batteryRangeValidator.IsSocRangeValid(soc) && 
                 batteryRangeValidator.IsChargeRateRangeValid(chargeRate))
             {
-                Logger.PrintMessage("Battery state is good.");
+                Logger.Log("Battery state is good.");
                 return true;
             }
             else
             {
-                Logger.PrintMessage("Battery state is critical!");
+                Logger.Log("Battery state is critical!");
                 return false;
             }
         }
