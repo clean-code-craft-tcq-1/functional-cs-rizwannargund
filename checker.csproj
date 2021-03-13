@@ -16,6 +16,7 @@
     <Compile Include="checker.cs" />
     <Compile Include="IValidator.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Target Name="Build">
     <Csc Sources="@(Compile)" />  
