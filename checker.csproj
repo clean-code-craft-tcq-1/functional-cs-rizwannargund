@@ -5,7 +5,10 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <ProjectGuid>{F846B7D1-43BF-4653-9BBA-3C6A8BA6657D}</ProjectGuid>
+    <ProjectGuid>{AAF6FE75-9D1A-41BC-BFDB-A6D7CE7EB79D}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>BatteryManagementSystem</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BatteryRangeValidator.cs" />
