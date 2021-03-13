@@ -1,38 +1,65 @@
 using System;
 using System.Diagnostics;
 
-class Checker
+namespace BatteryManagementSystem
 {
-    static bool batteryIsOk(float temperature, float soc, float chargeRate) {
-        if(temperature < 0 || temperature > 45) {
-            Console.WriteLine("Temperature is out of range!");
-            return false;
-        } else if(soc < 20 || soc > 80) {
-            Console.WriteLine("State of Charge is out of range!");
-            return false;
-        } else if(chargeRate > 0.8) {
-            Console.WriteLine("Charge Rate is out of range!");
-            return false;
-        }
-        return true;
-    }
+    public class BatteryStateChecker
+    {
+        private static BatteryRangeValidator batteryRangeValidator = new BatteryRangeValidator();
 
-    static void ExpectTrue(bool expression) {
-        if(!expression) {
-            Console.WriteLine("Expected true, but got false");
-            Environment.Exit(1);
+        static bool IsBatteryOk(float temperature, float soc, float chargeRate)
+            =>
+                (batteryRangeValidator.IsTemperatureRangeValid(temperature) &&
+                 batteryRangeValidator.IsSocRangeValid(soc) &&
+                 batteryRangeValidator.IsChargeRateRangeValid(chargeRate));
+        
+        static int Main()
+        {
+            batteryRangeValidator.MinimumTemperature = 0;
+            batteryRangeValidator.MaximumTemperature = 45;
+            batteryRangeValidator.MinimumSoc = 20;
+            batteryRangeValidator.MaximumSoc = 80;
+            batteryRangeValidator.MaximumChargeRate = 0.8f;
+
+            Logger.LogBatteryState(IsBatteryOk(-1, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(46, 70, 0.7f));
+
+            Logger.LogBatteryState(IsBatteryOk(25, 10, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 81, 0.7f));
+
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.7f));
+            Logger.LogBatteryState(IsBatteryOk(25, 70, 0.8f));
+
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                batteryRangeValidator.MinimumTemperature,
+                -1),"Temperature");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                batteryRangeValidator.MinimumTemperature,
+                25),"Temperature");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumTemperature,
+                batteryRangeValidator.MinimumTemperature,
+                46),"Temperature");
+
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                batteryRangeValidator.MinimumSoc,
+                10),"State of charge");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                batteryRangeValidator.MinimumSoc,
+                70),"State of charge");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumSoc,
+                batteryRangeValidator.MinimumSoc,
+                81),"State of charge");
+
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
+                0,
+                0.8f),"Charge rate");
+            Logger.LogBreachLevel(BreachChecker.GetBreachLevel(batteryRangeValidator.MaximumChargeRate,
+                0,
+                0.7f),"Charge rate");
+            Console.WriteLine("All ok");
+            return 0;
         }
-    }
-    static void ExpectFalse(bool expression) {
-        if(expression) {
-            Console.WriteLine("Expected false, but got true");
-            Environment.Exit(1);
-        }
-    }
-    static int Main() {
-        ExpectTrue(batteryIsOk(25, 70, 0.7f));
-        ExpectFalse(batteryIsOk(50, 85, 0.0f));
-        Console.WriteLine("All ok");
-        return 0;
     }
 }
